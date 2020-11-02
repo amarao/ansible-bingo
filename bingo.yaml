@@ -1,0 +1,128 @@
+---
+- hosts: localhost
+  gather_facts: false
+  ignore_errors: true
+  tasks:
+
+    - name: Normal
+      debug:
+      when: no
+
+    - name: Bingo 1
+      debug:
+      when: 'no'
+      # why 'no is a name varaible?
+
+    - name: Bingo 2
+      debug:
+      when: foo
+      vars:
+        foo: 'no'
+      # why 'no' is a varable name?
+
+    - name: Bingo 3
+      debug:
+      when: foo
+      vars:
+        foo: '[no]'
+      # why 'no' is NOT a varable name?
+
+    - name: Bingo 4
+      debug:
+      when: foo
+      vars:
+        foo: '{{ [no] }}'
+      # why 'no' is NOT a varable name?
+
+    - name: Bingo 5
+      debug:
+      when: foo == True
+      vars:
+        foo: '{{ [no] }}'
+      # Why is it evaluated without error? "No" is a variable name... I suppose... It must to be.
+
+    - name: Bingo 6
+      debug:
+      when: foo is True
+      vars:
+        foo: '{{ [no] }}'
+      # Just WTF
+
+    - name: Bingo 7
+      debug:
+      when: foo == [True]
+      vars:
+        foo: '{{ [yes] }}'
+      # If 'yes' is True, it must 'ok'.
+      # if 'yes' is variable, it should fail.
+      # It must not skip. WTF?
+
+    - name: Bingo 8
+      debug:
+      when: foo == True
+      vars:
+        foo: '{{ [some_undefined_variable] == 42 }}'
+      # You thought it's some dirty 'yes' thing, aren't you?
+      # haha.
+
+    - name: Bingo 9
+      debug:
+      when: foo
+      vars:
+        foo: '{{ [some_undefined_variable] = [42] }}'
+      # Shatter your intuition. Why Bingo 8 is skip and this is error?
+
+    - name: Bingo 10
+      debug:
+      when: foo
+      vars:
+        foo: '{{ "n" + "o" }}'
+      tags: [bingo10]
+      # Enjoy your ADIS... Ansible.
+
+    - name: Bingo 11
+      debug:
+      when: myvar == 1
+      vars:
+        myvar: '{{ 1 }}'
+      tags: [bingo11]
+
+    - name: Bingo 12
+      debug:
+      when: myvar == 1|int
+      vars:
+        myvar: '{{ 1|int }}'
+      tags: [bingo12]
+
+    - name: Normal
+      debug: var=item
+      loop: '{{ [] }}'
+
+    - name: Bingo 13
+      debug: var=item
+      loop: '{{ [] }} '
+
+    - name: Bingo 14
+      debug: var=item
+      loop: ' {{ [] }}'
+      # Either Bingo13 or Bingo14 is WTF. They both must work or both must fail.
+
+    - name: Bingo 15
+      debug:
+        msg: '{{ foo + 1 }}'
+      vars:
+        foo: '{{ [2]|length }}'
+
+    - name: Bingo 16
+      debug: msg={{message}}
+      vars:
+        br: "{"
+        message: '{{ br }}{{ br }} 3 + 2 }}'
+      tags: [bingo16]
+
+    - name: bingo 17
+      debug:
+        var: foo   # why it's not a dictionary but a string?
+      vars:
+        foo:
+          !!float .nan: 0
