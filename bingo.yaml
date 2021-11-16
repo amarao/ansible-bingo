@@ -126,3 +126,8 @@
       vars:
         foo:
           !!float .nan: 0
+
+    - name: bingo 18
+      debug:
+      loop: '{{ omit|list }}'  # how many 'hello words' will be printed?
+
