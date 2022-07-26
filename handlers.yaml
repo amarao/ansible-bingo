@@ -1,0 +1,17 @@
+---
+- name: How many times handler h2 will be called? Why?
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - debug: msg=start
+      changed_when: true
+      notify: h1
+  handlers:
+    - name: h1
+      debug: msg=hander1
+      changed_when: true
+      notify: h2
+    - name: h2
+      debug: msg=handler2
+      changed_when: true
+      notify: h1
